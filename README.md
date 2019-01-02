@@ -49,3 +49,17 @@ Again, use the zip function for multiple values. You can also specify the number
 >>> bng.from_osgb36(xy, nDigits=4)
 ['HU4339', 'SJ6456', 'TV3735']
 ```
+
+# For Developers
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run tests:
+
+```bash
+pytest -vs test_bng.py
+```

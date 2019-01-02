@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-# Filename: BNG.py
-
-############################################################################
+# ##########################################################################
 #
 #  COPYRIGHT:  (C) 2012-2019 John A Stevenson / @volcan01010
 #                            Magnus Hagdorn / @mhagdorn
@@ -19,16 +16,17 @@
 #
 #  http://www.gnu.org/licenses/gpl-3.0.html
 #
-#############################################################################/
+# ############################################################################
 
-__all__ = ['to_osgb36', 'from_osgb36']
+import re
 
 try:
     import numpy as np
 except ImportError:
-    print "Numpy not installed.  Numpy comes with most scientific python packages."
+    msg = ("Numpy not installed.  Numpy comes with most scientific/geospatial"
+           " Python packages.")
+    raise ImportError(msg)
 
-import re
 
 # Region codes for 100 km grid squares.
 _regions = [['HL', 'HM', 'HN', 'HO', 'HP', 'JL', 'JM'],
@@ -49,7 +47,6 @@ _regions = np.array([_regions[x] for x in range(12, -1, -1)])
 _regions = _regions.transpose()
 
 
-# -------------------------------------------------------------------------------
 def to_osgb36(coords):
     """Reformat British National Grid references to OSGB36 numeric coordinates.
     Grid references can be 4, 6, 8 or 10 figures.  Returns a tuple of x, y.
@@ -81,11 +78,13 @@ def to_osgb36(coords):
     #
     # Input is grid reference...
     #
-    elif type(coords) == str and re.match(r'^[A-Za-z]{2}(\d{6}|\d{8}|\d{10})$', coords):
+    elif type(coords) == str and re.match(
+            r'^[A-Za-z]{2}(\d{6}|\d{8}|\d{10})$', coords):
         region = coords[0:2].upper()
         x_box, y_box = np.where(_regions == region)
         try:  # Catch bad region codes
-            x_offset = 100000 * x_box[0]  # Convert index in 'regions' to offset
+            # Convert index in 'regions' to offset
+            x_offset = 100000 * x_box[0]
             y_offset = 100000 * y_box[0]
         except IndexError:
             raise ValueError('Invalid 100km grid square code')
@@ -99,10 +98,10 @@ def to_osgb36(coords):
     #
     else:
         raise TypeError(
-            'Valid inputs are 6,8 or 10-fig references as strings e.g. "NN123321", or lists/tuples/arrays of strings.')
+            'Valid inputs are 4, 6, 8 or 10-fig references as strings e.g. '
+            '"NN123321", or lists/tuples/arrays of strings.')
 
 
-# -------------------------------------------------------------------------------
 def from_osgb36(coords, nDigits=6):
     """Reformat OSGB36 numeric coordinates to British National Grid references.
     Grid references can be 4, 6, 8 or 10 fig, specified by the nDigits keyword.
@@ -111,14 +110,14 @@ def from_osgb36(coords, nDigits=6):
 
     Single value
     >>> from_osgb36((327550, 672950))
-    'NT276730'
+    'NT275729'
 
     For multiple values, use the zip function
     >>> x = [443143, 363723, 537395]
     >>> y = [1139158, 356004, 35394]
     >>> xy = zip(x, y)
     >>> from_osgb36(xy, nDigits=4)
-    ['HU4339', 'SJ6456', 'TV3735']
+    ['HU4339', 'SJ6356', 'TV3735']
     """
     if (type(coords) == list):
         return [from_osgb36(c, nDigits=nDigits) for c in coords]
@@ -127,8 +126,8 @@ def from_osgb36(coords, nDigits=6):
     #
     elif type(coords) == tuple:
         x, y = coords
-        x_box = np.floor(x / 100000.0)  # Convert offset to index in 'regions'
-        y_box = np.floor(y / 100000.0)
+        x_box = int(np.floor(x / 100000.0))  # Convert offset to index in 'regions'
+        y_box = int(np.floor(y / 100000.0))
         x_offset = 100000 * x_box
         y_offset = 100000 * y_box
         try:  # Catch coordinates outside the region
@@ -138,11 +137,13 @@ def from_osgb36(coords, nDigits=6):
         #
         # Format the output based on nDigits
         #
-        formats = {4: '%s%02i%02i', 6: '%s%03i%03i', 8: '%s%04i%04i', 10: '%s%05i%05i'}
+        formats = {4: '%s%02i%02i', 6: '%s%03i%03i', 8: '%s%04i%04i',
+                   10: '%s%05i%05i'}
         factors = {4: 1000.0, 6: 100.0, 8: 10.0, 10: 1.0}
         try:  # Catch bad number of figures
             coords = formats[nDigits] % (
-            region, np.floor((x - x_offset) / factors[nDigits]), np.floor((y - y_offset) / factors[nDigits]))
+                region, np.floor((x - x_offset) / factors[nDigits]),
+                np.floor((y - y_offset) / factors[nDigits]))
         except KeyError:
             raise ValueError('Valid inputs for nDigits are 4, 6, 8 or 10')
         return coords
