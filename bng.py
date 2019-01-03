@@ -89,9 +89,9 @@ def to_osgb36(coords):
         except IndexError:
             raise ValueError('Invalid 100km grid square code')
         nDigits = (len(coords) - 2) / 2
-        factor = 10 ** (5 - nDigits)
-        x, y = (int(coords[2:2 + nDigits]) * factor + x_offset,
-                int(coords[2 + nDigits:2 + 2 * nDigits]) * factor + y_offset)
+        factor = 10 ** (5 - int(nDigits))
+        x, y = (int(coords[2:2 + int(nDigits)]) * factor + x_offset,
+                int(coords[2 + int(nDigits):2 + 2 * int(nDigits)]) * factor + y_offset)
         return x, y
     #
     # Catch invalid input
