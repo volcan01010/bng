@@ -26,11 +26,11 @@ def test_from_osbg36_zipped_example():
     x = [443143, 363723, 537395]
     y = [1139158, 356004, 35394]
     xy = list(zip(x, y))
-    gridrefs = bng.from_osgb36(xy, nDigits=4)
+    gridrefs = bng.from_osgb36(xy, figs=4)
     assert gridrefs == ['HU4339', 'SJ6356', 'TV3735']
 
 
 def test_floor_example_from_dan_harasty():
     # See blog post comment for details of this example
-    gridref = bng.from_osgb36((529900, 199900), nDigits=4)
+    gridref = bng.from_osgb36((529900, 199900), figs=4)
     assert gridref == 'TQ2999'
