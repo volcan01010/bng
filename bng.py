@@ -30,6 +30,11 @@ except ImportError:
     raise ImportError(msg)
 
 
+class BNGError(Exception):
+    """Exception raised by bng.py module"""
+    pass
+
+
 # Region codes for 100 km grid squares.
 _regions = [['HL', 'HM', 'HN', 'HO', 'HP', 'JL', 'JM'],
             ['HQ', 'HR', 'HS', 'HT', 'HU', 'JQ', 'JR'],
@@ -68,40 +73,40 @@ def to_osgb36(gridref):
     >>> y
     (1139200, 356000, 35400)
     """
-    #
-    # Check for individual coord, or list, tuple or array of coords
-    #
+    # Process iterables
     if isinstance(gridref, list):
         return [to_osgb36(c) for c in gridref]
     elif isinstance(gridref, tuple):
         return tuple([to_osgb36(c) for c in gridref])
     elif isinstance(gridref, type(np.array('string'))):
         return np.array([to_osgb36(str(c)) for c in list(gridref)])
-    #
-    # Input is grid reference...
-    #
-    elif isinstance(gridref, str) and re.match(
-            r'^[A-Za-z]{2}(\d{4}|\d{6}|\d{8}|\d{10})$', gridref):
-        region = gridref[0:2].upper()
-        x_box, y_box = np.where(_regions == region)
-        try:  # Catch bad region codes
-            # Convert index in 'regions' to offset
-            x_offset = 100000 * x_box[0]
-            y_offset = 100000 * y_box[0]
-        except IndexError:
-            raise ValueError('Invalid 100km grid square code')
-        figs = int((len(gridref) - 2) / 2.0)
-        factor = 10 ** (5 - figs)
-        x, y = (int(gridref[2:2 + figs]) * factor + x_offset,
-                int(gridref[2 + figs:2 + 2 * figs]) * factor + y_offset)
-        return x, y
-    #
+
     # Catch invalid input
-    #
-    else:
-        raise TypeError(
-            'Valid inputs are 4, 6, 8 or 10-fig references as strings e.g. '
-            '"NN123321", or lists/tuples/arrays of strings.')
+    bad_input_message = (
+        'Valid gridref inputs are 4, 6, 8 or 10-fig references as strings '
+        'e.g. "NN123321", or lists/tuples/arrays of strings. '
+        '[{}]'.format(gridref))
+    try:
+        if not re.match(r'^[A-Za-z]{2}(\d{4}|\d{6}|\d{8}|\d{10})$', gridref):
+            raise BNGError(bad_input_message)
+    except TypeError:
+        # Non-string values will throw error
+        raise BNGError(bad_input_message)
+
+    # Process grid reference
+    region = gridref[0:2].upper()
+    x_box, y_box = np.where(_regions == region)
+    try:  # Catch bad region codes
+        # Convert index in 'regions' to offset
+        x_offset = 100000 * x_box[0]
+        y_offset = 100000 * y_box[0]
+    except IndexError:
+        raise BNGError('Invalid 100 km grid square code: {}'.format(region))
+    figs = int((len(gridref) - 2) / 2.0)
+    factor = 10 ** (5 - figs)
+    x, y = (int(gridref[2:2 + figs]) * factor + x_offset,
+            int(gridref[2 + figs:2 + 2 * figs]) * factor + y_offset)
+    return x, y
 
 
 def from_osgb36(coords, figs=6):
@@ -121,37 +126,45 @@ def from_osgb36(coords, figs=6):
     >>> from_osgb36(xy, figs=4)
     ['HU4339', 'SJ6356', 'TV3735']
     """
+    # Process items individually if a list if passed
     if isinstance(coords, list):
         return [from_osgb36(c, figs=figs) for c in coords]
-    #
-    # Input is a tuple of numeric coordinates...
-    #
-    elif isinstance(coords, tuple):
+
+    # Throw error if other input is bad
+    bad_input_message = ('Valid inputs are x, y tuple e.g. (651409, 313177),'
+                         ' or list of x, y tuples. [{}]'.format(coords))
+
+    if not isinstance(coords, tuple):
+        raise BNGError(bad_input_message)
+
+    try:
         x, y = coords
-        # Convert offset to index in 'regions'
-        x_box = int(np.floor(x / 100000.0))
-        y_box = int(np.floor(y / 100000.0))
-        x_offset = 100000 * x_box
-        y_offset = 100000 * y_box
-        try:  # Catch coordinates outside the region
-            region = _regions[x_box, y_box]
-        except IndexError:
-            raise ValueError('Coordinate location outside UK region')
-        #
-        # Format the output based on figs
-        #
-        formats = {4: '%s%02i%02i', 6: '%s%03i%03i', 8: '%s%04i%04i',
-                   10: '%s%05i%05i'}
-        factors = {4: 1000.0, 6: 100.0, 8: 10.0, 10: 1.0}
-        try:  # Catch bad number of figures
-            coords = formats[figs] % (
-                region, np.floor((x - x_offset) / factors[figs]),
-                np.floor((y - y_offset) / factors[figs]))
-        except KeyError:
-            raise ValueError('Valid inputs for figs are 4, 6, 8 or 10')
-        return coords
-    #
-    # Catch invalid input
-    #
-    else:
-        raise TypeError('Valid inputs are x, y tuple e.g. (651409, 313177)')
+    except ValueError:
+        raise BNGError(bad_input_message)
+
+    out_of_region_message = (
+        'Coordinate location outside UK region: {}'.format(coords))
+    if (x < 0) or (y < 0):
+        raise BNGError(out_of_region_message)
+
+    # Convert offset to index in 'regions'
+    x_box = int(np.floor(x / 100000.0))
+    y_box = int(np.floor(y / 100000.0))
+    x_offset = 100000 * x_box
+    y_offset = 100000 * y_box
+    try:  # Catch coordinates outside the region
+        region = _regions[x_box, y_box]
+    except IndexError:
+        raise BNGError(out_of_region_message)
+
+    # Format the output based on figs
+    formats = {4: '%s%02i%02i', 6: '%s%03i%03i', 8: '%s%04i%04i',
+               10: '%s%05i%05i'}
+    factors = {4: 1000.0, 6: 100.0, 8: 10.0, 10: 1.0}
+    try:  # Catch bad number of figures
+        coords = formats[figs] % (
+            region, np.floor((x - x_offset) / factors[figs]),
+            np.floor((y - y_offset) / factors[figs]))
+    except KeyError:
+        raise BNGError('Valid inputs for figs are 4, 6, 8 or 10')
+    return coords

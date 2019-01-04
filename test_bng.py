@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import numpy as np
 import pytest
 
 import bng
@@ -77,25 +78,58 @@ def test_to_osgb36_converts_list_of_strings():
     assert x == (443100, 363700, 537400)
     assert y == (1139200, 356000, 35400)
 
-#def test_from_osgb36_throws_bng_error_on_bad_coords_type():
-#def test_from_osgb36_throws_bng_error_on_coord_out_of_range():
-#def test_from_osgb36_throws_bng_error_on_bad_figs_value():
 
-#def test_to_osgb36_throws_bng_error_on_bad_coords_type():
-#def test_to_osgb36_throws_bng_error_on_coord_out_of_range():
-#def test_to_osgb36_throws_bng_error_on_bad_figs_value():
-
-# Original tests from documented examples
-#def test_from_osgb36_throws_error_on_bad_coords_type():
-#def test_from_osgb36_throws_error_on_coord_out_of_range():
-#def test_from_osgb36_throws_error_on_bad_figs_value():
-
-#def test_to_osgb36_throws_error_on_bad_coords_type():
-#def test_to_osgb36_throws_error_on_coord_out_of_range():
-#def test_to_osgb36_throws_error_on_bad_figs_value():
+def test_to_osgb36_converts_numpy_array():
+    gridrefs = np.array(['HU431392', 'SJ637560', 'TV374354'])
+    xy = bng.to_osgb36(gridrefs)
+    x, y = zip(*xy)
+    assert x == (443100, 363700, 537400)
+    assert y == (1139200, 356000, 35400)
 
 
-def test_floor_example_from_dan_harasty():
-    # See blog post comment for details of this example
-    gridref = bng.from_osgb36((529900, 199900), figs=4)
-    assert gridref == 'TQ2999'
+@pytest.mark.parametrize('coords', [
+    'string_input',
+    ['list', 'of', 'strings'],
+    1,
+    1.1,
+    (1,),
+    (1, 2, 3),
+])
+def test_from_osgb36_throws_bng_error_on_bad_coords_type(coords):
+    with pytest.raises(bng.BNGError, match=r'Valid inputs are .*'):
+        bng.from_osgb36(coords)
+
+
+@pytest.mark.parametrize('coords', [
+    (-1, 0),
+    (0, -1),
+    (-1, -1),
+    (8e5, 0),
+    (0, 13e5),
+    (8e5, 13e5),
+])
+def test_from_osgb36_throws_bng_error_on_coords_out_of_range(coords):
+    with pytest.raises(bng.BNGError, match=r'Coordinate location outside .*'):
+        bng.from_osgb36(coords)
+
+
+@pytest.mark.parametrize('figs', [-1, 1, 3, 11])
+def test_from_osgb36_throws_bng_error_on_bad_figs_value(figs):
+    with pytest.raises(bng.BNGError, match=r'Valid inputs for figs are .*'):
+        bng.from_osgb36((123456, 123456), figs=figs)
+
+
+@pytest.mark.parametrize('gridref', [
+    'Not a grid reference',
+    1234,
+    np.array(['some', 'bad', 'text'])
+    ])
+def test_to_osgb36_throws_bng_error_on_bad_gridref_type(gridref):
+    with pytest.raises(bng.BNGError, match=r'Valid gridref inputs are.*'):
+        bng.to_osgb36(gridref)
+
+
+@pytest.mark.parametrize('gridref', ['AA1234', 'ZZ1234', 'NI1234'])
+def test_to_osgb36_throws_bng_error_on_invalid_100km_square(gridref):
+    with pytest.raises(bng.BNGError, match=r'Invalid 100 km grid square.*'):
+        bng.to_osgb36(gridref)
