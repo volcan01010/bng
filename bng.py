@@ -69,16 +69,16 @@ def to_osgb36(coords):
     #
     # Check for individual coord, or list, tuple or array of coords
     #
-    if type(coords) == list:
+    if isinstance(coords, list):
         return [to_osgb36(c) for c in coords]
-    elif type(coords) == tuple:
+    elif isinstance(coords, tuple):
         return tuple([to_osgb36(c) for c in coords])
-    elif type(coords) == type(np.array('string')):
+    elif isinstance(coords, type(np.array('string'))):
         return np.array([to_osgb36(str(c)) for c in list(coords)])
     #
     # Input is grid reference...
     #
-    elif type(coords) == str and re.match(
+    elif isinstance(coords, str) and re.match(
             r'^[A-Za-z]{2}(\d{6}|\d{8}|\d{10})$', coords):
         region = coords[0:2].upper()
         x_box, y_box = np.where(_regions == region)
@@ -119,14 +119,15 @@ def from_osgb36(coords, nDigits=6):
     >>> from_osgb36(xy, nDigits=4)
     ['HU4339', 'SJ6356', 'TV3735']
     """
-    if (type(coords) == list):
+    if isinstance(coords, list):
         return [from_osgb36(c, nDigits=nDigits) for c in coords]
     #
     # Input is a tuple of numeric coordinates...
     #
-    elif type(coords) == tuple:
+    elif isinstance(coords, tuple):
         x, y = coords
-        x_box = int(np.floor(x / 100000.0))  # Convert offset to index in 'regions'
+        # Convert offset to index in 'regions'
+        x_box = int(np.floor(x / 100000.0))
         y_box = int(np.floor(y / 100000.0))
         x_offset = 100000 * x_box
         y_offset = 100000 * y_box
