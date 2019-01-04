@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import bng
 
 # Original tests from documented examples
