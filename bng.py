@@ -29,6 +29,9 @@ except ImportError:
            " Python packages.")
     raise ImportError(msg)
 
+__version__ = '1.0.0'
+__all__ = ['to_osgb36', 'from_osgb36']
+
 
 class BNGError(Exception):
     """Exception raised by bng.py module"""
