@@ -49,7 +49,7 @@ _regions = np.array([_regions[x] for x in range(12, -1, -1)])
 _regions = _regions.transpose()
 
 
-def to_osgb36(coords):
+def to_osgb36(gridref):
     """Reformat British National Grid references to OSGB36 numeric coordinates.
     Grid references can be 4, 6, 8 or 10 figures.  Returns a tuple of x, y.
 
@@ -71,18 +71,18 @@ def to_osgb36(coords):
     #
     # Check for individual coord, or list, tuple or array of coords
     #
-    if isinstance(coords, list):
-        return [to_osgb36(c) for c in coords]
-    elif isinstance(coords, tuple):
-        return tuple([to_osgb36(c) for c in coords])
-    elif isinstance(coords, type(np.array('string'))):
-        return np.array([to_osgb36(str(c)) for c in list(coords)])
+    if isinstance(gridref, list):
+        return [to_osgb36(c) for c in gridref]
+    elif isinstance(gridref, tuple):
+        return tuple([to_osgb36(c) for c in gridref])
+    elif isinstance(gridref, type(np.array('string'))):
+        return np.array([to_osgb36(str(c)) for c in list(gridref)])
     #
     # Input is grid reference...
     #
-    elif isinstance(coords, str) and re.match(
-            r'^[A-Za-z]{2}(\d{6}|\d{8}|\d{10})$', coords):
-        region = coords[0:2].upper()
+    elif isinstance(gridref, str) and re.match(
+            r'^[A-Za-z]{2}(\d{4}|\d{6}|\d{8}|\d{10})$', gridref):
+        region = gridref[0:2].upper()
         x_box, y_box = np.where(_regions == region)
         try:  # Catch bad region codes
             # Convert index in 'regions' to offset
@@ -90,10 +90,10 @@ def to_osgb36(coords):
             y_offset = 100000 * y_box[0]
         except IndexError:
             raise ValueError('Invalid 100km grid square code')
-        figs = int((len(coords) - 2) / 2.0)
+        figs = int((len(gridref) - 2) / 2.0)
         factor = 10 ** (5 - figs)
-        x, y = (int(coords[2:2 + figs]) * factor + x_offset,
-                int(coords[2 + figs:2 + 2 * figs]) * factor + y_offset)
+        x, y = (int(gridref[2:2 + figs]) * factor + x_offset,
+                int(gridref[2 + figs:2 + 2 * figs]) * factor + y_offset)
         return x, y
     #
     # Catch invalid input
@@ -105,7 +105,7 @@ def to_osgb36(coords):
 
 
 def from_osgb36(coords, figs=6):
-    """Reformat OSGB36 numeric coordinates to British National Grid references.
+    """Reformat osgb36 numeric coordinates to British National Grid references.
     Grid references can be 4, 6, 8 or 10 fig, specified by the figs keyword.
 
     Examples:
@@ -114,10 +114,10 @@ def from_osgb36(coords, figs=6):
     >>> from_osgb36((327550, 672950))
     'NT275729'
 
-    For multiple values, use the zip function
+    For multiple values, use the zip function to create list of tuples
     >>> x = [443143, 363723, 537395]
     >>> y = [1139158, 356004, 35394]
-    >>> xy = zip(x, y)
+    >>> xy = list(zip(x, y))
     >>> from_osgb36(xy, figs=4)
     ['HU4339', 'SJ6356', 'TV3735']
     """
