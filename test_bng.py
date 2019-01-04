@@ -24,7 +24,7 @@ def test_from_osbg36_single_example():
 def test_from_osbg36_zipped_example():
     x = [443143, 363723, 537395]
     y = [1139158, 356004, 35394]
-    xy = zip(x, y)
+    xy = list(zip(x, y))
     gridrefs = bng.from_osgb36(xy, nDigits=4)
     assert gridrefs == ['HU4339', 'SJ6356', 'TV3735']
 

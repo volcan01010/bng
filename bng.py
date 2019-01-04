@@ -2,6 +2,7 @@
 #
 #  COPYRIGHT:  (C) 2012-2019 John A Stevenson / @volcan01010
 #                            Magnus Hagdorn / @mhagdorn
+#                            Jumy Elǝrossë / @realjumy
 #  WEBSITE: http://all-geo.org/volcan01010
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -88,7 +89,7 @@ def to_osgb36(coords):
             y_offset = 100000 * y_box[0]
         except IndexError:
             raise ValueError('Invalid 100km grid square code')
-        nDigits = (len(coords) - 2) / 2
+        nDigits = int((len(coords) - 2) / 2.0)
         factor = 10 ** (5 - nDigits)
         x, y = (int(coords[2:2 + nDigits]) * factor + x_offset,
                 int(coords[2 + nDigits:2 + 2 * nDigits]) * factor + y_offset)

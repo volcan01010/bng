@@ -45,14 +45,14 @@ Again, use the zip function for multiple values. You can also specify the number
 ```python
 >>> x = [443143, 363723, 537395]
 >>> y = [1139158, 356004, 35394]
->>> xy = zip(x, y)
+>>> xy = list(zip(x, y))
 >>> bng.from_osgb36(xy, nDigits=4)
 ['HU4339', 'SJ6456', 'TV3735']
 ```
 
 # For Developers
 
-Install dependencies:
+Install developer dependencies:
 
 ```bash
 pip install -r requirements.txt
