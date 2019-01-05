@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 import pytest
 
 import bng
@@ -31,23 +30,11 @@ def test_from_osgb36_selects_correct_square(x, y, expected):
     assert gridref == expected
 
 
-def test_from_osgb36_converts_list_of_tuples():
-    x = [443143, 363723, 537395]
-    y = [1139158, 356004, 35394]
-    xy = list(zip(x, y))
-    gridrefs = bng.from_osgb36(xy, figs=4)
-    assert gridrefs == ['HU4339', 'SJ6356', 'TV3735']
-
-
 @pytest.mark.parametrize("gridref, expected", [
-    ('SV0101', (1000, 1000)),
-    ('SV012012', (1200, 1200)),
-    ('SV01230123', (1230, 1230)),
-    ('SV0123401234', (1234, 1234)),
-    ('SV5656', (56000, 56000)),
-    ('SV567567', (56700, 56700)),
-    ('SV56785678', (56780, 56780)),
-    ('SV5678956789', (56789, 56789)),
+    ('SV0156', (1000, 56000)),
+    ('SV012567', (1200, 56700)),
+    ('SV01235678', (1230, 56780)),
+    ('SV0123456789', (1234, 56789)),
 ])
 def test_to_osgb36_expands_figures_correctly(gridref, expected):
     # Test covers numbers below and over 5
@@ -69,22 +56,6 @@ def test_to_osgb36_handles_lower_case_input():
 def test_to_osgb36_calculates_correct_offset(gridref, expected):
     coords = bng.to_osgb36(gridref)
     assert coords[:2] == expected[:2]
-
-
-def test_to_osgb36_converts_list_of_strings():
-    gridrefs = ['HU431392', 'SJ637560', 'TV374354']
-    xy = bng.to_osgb36(gridrefs)
-    x, y = zip(*xy)
-    assert x == (443100, 363700, 537400)
-    assert y == (1139200, 356000, 35400)
-
-
-def test_to_osgb36_converts_numpy_array():
-    gridrefs = np.array(['HU431392', 'SJ637560', 'TV374354'])
-    xy = bng.to_osgb36(gridrefs)
-    x, y = zip(*xy)
-    assert x == (443100, 363700, 537400)
-    assert y == (1139200, 356000, 35400)
 
 
 @pytest.mark.parametrize('coords', [
@@ -122,7 +93,6 @@ def test_from_osgb36_throws_bng_error_on_bad_figs_value(figs):
 @pytest.mark.parametrize('gridref', [
     'Not a grid reference',
     1234,
-    np.array(['some', 'bad', 'text'])
     ])
 def test_to_osgb36_throws_bng_error_on_bad_gridref_type(gridref):
     with pytest.raises(bng.BNGError, match=r'Valid gridref inputs are.*'):

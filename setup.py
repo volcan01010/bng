@@ -9,7 +9,7 @@ with open(readme_file) as f:
 
 setup(
     name="bng",
-    version="1.0.0",
+    version="1.0.2",
     description=("Convert between BNG grid refs (e.g. NT123456) and "
                  "OSGB36 (EPSG:27700) coords"),
     long_description=README,
@@ -22,6 +22,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 2.7",
     ],
-    install_requires=["numpy"],
     py_modules=["bng"]
 )
