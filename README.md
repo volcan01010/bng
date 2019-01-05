@@ -5,9 +5,19 @@ Python functions to convert `osgb36` (EPSG:27700) coordinates to/from 4, 6, 8, o
 This script was originally published on of the [Easily change coordinate projection systems in Python with pyproj](http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/) blog post.
 See blog post for more information and for details on converting other coordinate systems to `osbg36`.
 
+# Installation
+
+bng can be installed for Python 2.7 or Python 3 using pip:
+
+```
+pip install git+git://github.com/volcan01010/bng
+```
+
 # Instructions
 
-The function converts between a bng grid reference as a string, and a tuple of OSGB36 (x,y) coordinates. When converting to bng coordinates, there is an opportunity to specify how many figures to use.
+The function converts between a bng grid references as strings, and a tuple of OSGB36 (x,y) coordinates.
+It can also handle lists, tuples or numpy arrays of grid reference strings and lists of coord tuples.
+When converting to bng coordinates, there is an opportunity to specify how many figures to use.
 
 bng coordinates can be converted to osbg36 (EPSG:27700) coordinates as follows:
 
