@@ -1,13 +1,13 @@
 # BNG
 
-> Convert between BNG grid refs (e.g. NT123456) OSGB36 (EPSG:27700) coords
+> Convert between BNG grid refs (e.g. NT123456) and OSGB36 (EPSG:27700) coords
 
-Coordinates in the [Ordnance Survey National Grid](https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid) or British National Grid are often defined by alphanumeric grid references.
-These are based on the `osgb36` (EPSG:27700) coordinate reference system.
-This module contains Python functions to convert `osgb36` coordinates to/from 4, 6, 8, or 10 figure alphanumeric grid references.
+Coordinates in the [Ordnance Survey National Grid](https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid) or British National Grid are often defined by alphanumeric grid references that refer to grid squares.
+These are based on the `osgb36` (EPSG:27700) coordinate reference system but are not understood by most GIS software.
+This module contains Python functions to convert 4, 6, 8, or 10 figure alphanumeric grid references to/from pure `osgb36` coordinates.
 
-This code was originally published on the [Easily change coordinate projection systems in Python with pyproj](http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/) blog post.
-See it for more information and for details on converting between coordinate systems using Python.
+This code was originally published on a blog post: [Easily change coordinate projection systems in Python with pyproj](http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/).
+The blog post contains more information and instructions for converting between coordinate systems using Python.
 
 ## Installation
 
@@ -33,6 +33,8 @@ bng.to_osgb36('NT2755072950')
 # (327550, 672950)
 ```
 
+The coordinates correspond to the southwest corner of the grid square described by the grid reference.
+
 For multiple values, use Python's zip function and list comprehension:
 
 ```python
@@ -47,16 +49,17 @@ y
 
 ### from_osbg36
 
-`osbg36` coordinates can be converted to BNG grid references as follows.
+BNG grid references can be created from`osbg36` coordinates as follows.
 
 Single values:
 ```python
 import bng
-bng.to_osgb36('NT2755072950')
-# (327550, 672950)
+bng.from_osgb36((327550, 672950), figs=6)
+# 'NT275729'
 ```
 
 The number of figures in the grid reference can be specified.
+The coordinates correspond to the southwest corner of the grid square containing the (x, y) coordinates.
 
 For multiple values, use Python's zip function and list comprehension:
 ```python
@@ -105,9 +108,9 @@ bng.from_osgb36((x, y))
 # 'NT275729'
 ```
 
-Note that for surveying work (i.e. < 1 m) it is necessary to make a geoid correction.
-The OSTN2 transformation model used to do this is available on the [Ordnance Survey website](https://www.ordnancesurvey.co.uk/business-and-government/help-and-support/navigation-technology/os-net/formats-for-developers.html).
-Proj [is able to use](https://proj4.org/resource_files.html) grid correction files in NTv2 format.
+Note that for surveying work (i.e. < 1 m accuracy) it is necessary to make a geoid correction.
+Proj [uses](https://proj4.org/resource_files.html) grid correction files in NTv2 format to make this correction.
+The Ordnance Survey provide these files (OSTN2 transformation model) [on their website](https://www.ordnancesurvey.co.uk/business-and-government/help-and-support/navigation-technology/os-net/formats-for-developers.html).
 
 
 ## For Developers

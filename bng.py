@@ -22,7 +22,7 @@
 import math
 import re
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 __all__ = ['to_osgb36', 'from_osgb36']
 
 
