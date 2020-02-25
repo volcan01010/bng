@@ -9,7 +9,7 @@ with open(readme_file) as f:
 
 setup(
     name="bng",
-    version="1.0.3",
+    version="1.0.5",
     description=("Convert between BNG grid refs (e.g. NT123456) and "
                  "OSGB36 (EPSG:27700) coords"),
     long_description=README,
