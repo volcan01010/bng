@@ -81,14 +81,18 @@ import bng
 import pyproj
 
 # Define coordinate systems
-wgs84=pyproj.Proj("+init=EPSG:4326") # LatLon with WGS84 datum used by GPS units and Google Earth
-osgb36=pyproj.Proj("+init=EPSG:27700") # UK Ordnance Survey, 1936 datum
+wgs84=pyproj.CRS("EPSG:4326") # LatLon with WGS84 datum used by GPS units and Google Earth
+osgb36=pyproj.CRS("EPSG:27700") # UK Ordnance Survey, 1936 datum
 
 # Transform
 x, y = bng.to_osgb36('NT2755072950')
 pyproj.transform(osgb36, wgs84, x, y)
-# (-3.1615548588213667, 55.944109545140932)
+# (55.94410954187127, -3.1615548049941133i)
 ```
+
+**Note**: older versions of pyproj use `pyproj.Proj("+init=EPSG:4326")` syntax
+and [return coordinates in lon, lat
+order](https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6).
 
 GPS coordinates can be converted to BNG grid references as follows:
 
@@ -97,15 +101,15 @@ import bng
 import pyproj
 
 # Define coordinate systems
-wgs84=pyproj.Proj("+init=EPSG:4326") # LatLon with WGS84 datum used by GPS units and Google Earth
-osgb36=pyproj.Proj("+init=EPSG:27700") # UK Ordnance Survey, 1936 datum
+wgs84=pyproj.CRS("EPSG:4326") # LatLon with WGS84 datum used by GPS units and Google Earth
+osgb36=pyproj.CRS("EPSG:27700") # UK Ordnance Survey, 1936 datum
 
 # Transform
 lon = -3.1615548588213667
 lat = 55.944109545140932
-x, y = pyproj.transform(wgs84, osgb36, lon, lat)
+x, y = pyproj.transform(wgs84, osgb36, lat, lon)
 bng.from_osgb36((x, y))
-# 'NT275729'
+# 'NT275729
 ```
 
 Note that for surveying work (i.e. < 1 m accuracy) it is necessary to make a geoid correction.
