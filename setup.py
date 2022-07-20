@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
-from setuptools import setup
 
 # Get contents of README for long description
 readme_file = os.path.join(os.path.dirname(__file__), 'README.md')
@@ -19,7 +17,7 @@ setup(
     author_email="johnalexanderstevenson@gmail.com",
     license="GPLv3.0",
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 2.7",
     ],
     py_modules=["bng"]

@@ -63,7 +63,7 @@ def _init_regions_and_offsets():
 _regions, _offset_map = _init_regions_and_offsets()
 
 
-def to_osgb36(gridref):
+def to_osgb36(gridref: str) -> (int, int):
     """
     Convert British National Grid references to OSGB36 numeric coordinates.
     Grid references can be 4, 6, 8 or 10 figures.
@@ -121,7 +121,7 @@ def to_osgb36(gridref):
     return x, y
 
 
-def from_osgb36(coords, figs=6):
+def from_osgb36(coords: (int, int), figs: int = 6) -> str:
     """
     Convert osgb36 numeric coordinates to British National Grid references.
     Grid references can be 4, 6, 8 or 10 fig, specified by the figs keyword.
