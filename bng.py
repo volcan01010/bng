@@ -121,7 +121,7 @@ def to_osgb36(gridref: str) -> (int, int):
     return x, y
 
 
-def from_osgb36(coords: (int, int), figs = 6) -> str:
+def from_osgb36(coords: (int, int), figs: int = 6) -> str:
     """
     Convert osgb36 numeric coordinates to British National Grid references.
     Grid references can be 4, 6, 8 or 10 fig, specified by the figs keyword.
