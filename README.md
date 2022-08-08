@@ -19,11 +19,11 @@ pip install bng
 
 ## Instructions
 
-The `to_osbg36` and `from_osbg36` functions are used to convert between tuples of OSGB36 (x, y) coordinates and alphanumeric grid references.
+The `to_osgb36` and `from_osgb36` functions are used to convert between tuples of OSGB36 (x, y) coordinates and alphanumeric grid references.
 
-### to_osbg36
+### to_osgb36
 
-BNG grid references can be converted to `osbg36` coordinates as follows.
+BNG grid references can be converted to `osgb36` coordinates as follows.
 
 Single values:
 
@@ -47,9 +47,9 @@ y
 # (1139200, 356000, 35400)
 ```
 
-### from_osbg36
+### from_osgb36
 
-BNG grid references can be created from`osbg36` coordinates as follows.
+BNG grid references can be created from`osgb36` coordinates as follows.
 
 Single values:
 ```python
